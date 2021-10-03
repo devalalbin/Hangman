@@ -8,76 +8,136 @@ namespace Hangman
     {
         static void Main(string[] args)
         {
+            int userChoice;
             
-                int nrOfGuesses = 0; //initilizing starting values
-                int maxGuesses = 10;
-                string answer = GetRndWord(); // Gets a random answer as our answer
-                string userGuess;
-                bool win = false;
+            while (true)
+            {
 
 
-                StringBuilder incorrectLetters = new StringBuilder(); //stringbuilder to put all incorrect letters
-                char[] correctLetters = new char[answer.Length]; // array of chars that sets the lenght of our masked/correct letters to same lenght as answer
-                Console.WriteLine(" Welcome to hangman! (0 to exit)");
-                for (int i = 0; i < answer.Length; i++)
+                Console.Clear();
+                Console.WriteLine("Press 1 to play hangman enter 0 to exit");
+                userChoice = GetNumberFromUser(); //User picks what function they want to use
+
+
+
                 {
-                    correctLetters[i] = '_'; //masking our correct answer as _
-                    Console.Write(correctLetters[i]);
-                }
-                
-
-               
-                
-
-
-                while (nrOfGuesses <= maxGuesses)
-                {
-                    Console.WriteLine("Guess a letter or a word");
-                    Console.WriteLine("Number of guesses left " + (maxGuesses - nrOfGuesses));
-
-
-                    string correctString = new string(correctLetters);
-                    if (Equals(correctString, answer))
-                    {
-
-                        Console.WriteLine("hey good job you guessed every letter right! " + correctString); //user won by guessing every letter correct
-                    CheckIfGameOver(maxGuesses, nrOfGuesses, true, answer);
-                   
-                    }
-                    userGuess = GetUserGuess(correctLetters, incorrectLetters); // get user guess here
-                    Console.WriteLine(correctLetters);
-                    if (userGuess.Length == 1) //check user guess is a letter else its a word
-                    {
-                        //  User guess is a letter
-                        nrOfGuesses++;
-                        GuessTrueOrFalse(userGuess, incorrectLetters, answer, correctLetters);
+                    switch (userChoice)
+                    {      //switch case statement as the "menu" on what 
+                        case 0: return; // exit
+                        case 1:
+                            HangmanGame();
+                            break;
                         
+                        
+                        default:
+                            Console.WriteLine("Please enter a valid number! (0 to exit)");
+                            break;
+
+
+
+
+
+                    }
+                }
+
+
+            }
+        }
+        static int GetNumberFromUser()
+        {
+            int userInput = 0;
+            bool succeeded = false;
+            while (!succeeded)
+            {
+                succeeded = int.TryParse(Console.ReadLine(), out userInput);// checking if the character is a valid number
+                if (!succeeded)
+                {
+                    Console.WriteLine("Enter 1 to play hangman 0 to exit");
+                }
+            }
+            //Console.WriteLine(succeeded);
+            return userInput;
+        }
+
+
+
+        static void HangmanGame()
+        {
+
+            int nrOfGuesses = 0; //initilizing starting values
+            int maxGuesses = 10;
+            string answer = GetRndWord(); // Gets a random answer as our answer
+            string userGuess;
+            bool win = false;
+            bool end = false;
+
+
+            StringBuilder incorrectLetters = new StringBuilder(); //stringbuilder to put all incorrect letters
+            char[] correctLetters = new char[answer.Length]; // array of chars that sets the lenght of our masked/correct letters to same lenght as answer
+            Console.WriteLine(" Welcome to hangman! (0 to exit)");
+            for (int i = 0; i < answer.Length; i++)
+            {
+                correctLetters[i] = '_'; //masking our correct answer as _
+                Console.Write(correctLetters[i]);
+            }
+
+
+
+
+
+
+            while (nrOfGuesses <= maxGuesses)
+            {
+                Console.WriteLine("Guess a letter or a word");
+                Console.WriteLine("Number of guesses left " + (maxGuesses - nrOfGuesses));
+
+
+                string correctString = new string(correctLetters);
+                if (Equals(correctString, answer))
+                {
+
+                    Console.WriteLine("hey good job you guessed every letter right! " + correctString); //user won by guessing every letter correct
+                    CheckIfGameOver(maxGuesses, nrOfGuesses, true, answer);
+
+                }
+                userGuess = GetUserGuess(correctLetters, incorrectLetters); // get user guess here
+                Console.WriteLine(correctLetters);
+                if (userGuess.Length == 1) //check user guess is a letter else its a word
+                {
+                    //  User guess is a letter
+                    nrOfGuesses++;
+                    GuessTrueOrFalse(userGuess, incorrectLetters, answer, correctLetters);
+
+                }
+                else
+                {
+                    // User guess is a word
+                    if (userGuess == answer)
+                    {
+
+                        win = true;
+
+
                     }
                     else
                     {
-                        // User guess is a word
-                        if (userGuess == answer)
-                        {
-                            
-                            win = true;
-                           
-
-                        }
-                        else
-                        {
-                            Console.WriteLine("Sorry! That is not the correct word (you lose 2 guesses)");
-                            nrOfGuesses = nrOfGuesses + 2;
+                        Console.WriteLine("Sorry! That is not the correct word (you lose 2 guesses)");
+                        nrOfGuesses = nrOfGuesses + 2;
 
 
 
-                        }
                     }
+                }
 
-                    CheckIfGameOver(maxGuesses, nrOfGuesses, win, answer);
+                end = CheckIfGameOver(maxGuesses, nrOfGuesses, win, answer);
+                if (end == true)
+                {
+                    break;
+                }
 
-                
+
             }
-            
+
 
 
 
@@ -152,7 +212,7 @@ namespace Hangman
             }
             return correctLetters;
         }
-        static void CheckIfGameOver(int maxguesses, int guesses, bool win, string answer) { //returns win or loss bool
+        static bool CheckIfGameOver(int maxguesses, int guesses, bool win, string answer) { //returns win or loss bool
 
             if (win == false)
             {
@@ -160,7 +220,8 @@ namespace Hangman
                 {
                     Console.WriteLine("Sadly you did not guess the correct word, the word was " + answer + " better luck next time!");
                     Console.Read();
-                    Environment.Exit(0);
+                    //Environment.Exit(0);
+                    return true;
 
                 }
 
@@ -170,11 +231,12 @@ namespace Hangman
             {
                 Console.WriteLine("CONGRATULATIONS! the word was : " + answer + " You won hangman with " + (maxguesses - guesses) + " guesses left!");
                 Console.Read();
-                Environment.Exit(0);
+                //Environment.Exit(0);
+                return true;
 
             }
-            
 
+            return false; // end = false if endcondition is not met
         }
         
     }
